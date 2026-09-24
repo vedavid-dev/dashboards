@@ -1,0 +1,8 @@
+# Every dashboard at once. Pick directories instead to take only some.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - k8s
+  - postgres
+  - redis
+  - rust-k8s-demo
