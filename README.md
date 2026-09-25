@@ -6,7 +6,7 @@ per subject; take the ones your cluster has metrics for.
 
 | Directory | Dashboard | Needs |
 | --- | --- | --- |
-| [`k8s/`](k8s/) | Cluster health | kube-state-metrics, node-exporter |
+| [`k8s/`](k8s/) | Cluster health, and Prometheus itself | kube-state-metrics, node-exporter, Prometheus's self-scrape |
 | [`postgres/`](postgres/) | Postgres | postgres-exporter |
 | [`redis/`](redis/) | Redis | redis_exporter |
 | [`rust-k8s-demo/`](rust-k8s-demo/) | Service latency hop by hop, and the quotation service's internals | the demo application's own metrics |

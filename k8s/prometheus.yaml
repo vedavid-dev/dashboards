@@ -1,0 +1,63 @@
+version: 1
+id: prometheus
+title: Prometheus
+sections:
+  - title: Health
+    elements:
+      - type: stat
+        title: Targets down
+        query: count(up == 0) or vector(0)
+        unit: count
+        thresholds:
+          direction: above
+          steps:
+            - { at: 1, level: warning }
+            - { at: 3, level: critical }
+      - type: stat
+        title: Series in memory
+        query: sum(prometheus_tsdb_head_series{job="prometheus"})
+        unit: short
+        decimals: 0
+      - type: stat
+        title: Samples per second
+        query: sum(rate(prometheus_tsdb_head_samples_appended_total{job="prometheus"}[5m]))
+        unit: ops_per_sec
+        decimals: 0
+      - type: stat
+        title: Storage on disk
+        query: sum(prometheus_tsdb_storage_blocks_bytes{job="prometheus"}) + sum(prometheus_tsdb_wal_storage_size_bytes{job="prometheus"})
+        unit: bytes
+  - title: Scraping
+    elements:
+      - type: list
+        title: Targets by job
+        query: sum by (job) (up)
+        unit: count
+        label: "{{job}}"
+        sort: label
+        limit: 10
+      - type: line
+        title: Scrape duration p95 by job
+        query: histogram_quantile(0.95, sum by (job, le) (rate(scrape_duration_seconds_bucket[5m]))) or max by (job) (scrape_duration_seconds)
+        unit: seconds
+        series:
+          label: "{{job}}"
+      - type: line
+        title: Samples dropped
+        description: Out-of-order, out-of-bounds or duplicate samples the server refused.
+        query: sum(rate(prometheus_target_scrapes_sample_out_of_order_total{job="prometheus"}[5m])) + sum(rate(prometheus_target_scrapes_sample_out_of_bounds_total{job="prometheus"}[5m])) + sum(rate(prometheus_target_scrapes_sample_duplicate_timestamp_total{job="prometheus"}[5m]))
+        unit: ops_per_sec
+  - title: Storage and queries
+    elements:
+      - type: line
+        title: Series in memory
+        query: sum(prometheus_tsdb_head_series{job="prometheus"})
+        unit: short
+      - type: line
+        title: Query duration p95
+        query: max(prometheus_engine_query_duration_seconds{job="prometheus", quantile="0.9"})
+        unit: seconds
+      - type: line
+        title: WAL fsync p95
+        query: histogram_quantile(0.95, sum by (le) (rate(prometheus_tsdb_wal_fsync_duration_seconds_bucket{job="prometheus"}[5m]))) or sum(rate(prometheus_tsdb_wal_fsync_duration_seconds_sum{job="prometheus"}[5m])) / sum(rate(prometheus_tsdb_wal_fsync_duration_seconds_count{job="prometheus"}[5m]))
+        unit: seconds
