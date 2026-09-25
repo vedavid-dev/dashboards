@@ -9,7 +9,7 @@ per subject; take the ones your cluster has metrics for.
 | [`k8s/`](k8s/) | Cluster health | kube-state-metrics, node-exporter |
 | [`postgres/`](postgres/) | Postgres | postgres-exporter |
 | [`redis/`](redis/) | Redis | redis_exporter |
-| [`rust-k8s-demo/`](rust-k8s-demo/) | Service latency, hop by hop | the demo application's own metrics |
+| [`rust-k8s-demo/`](rust-k8s-demo/) | Service latency hop by hop, and the quotation service's internals | the demo application's own metrics |
 
 Each directory builds one ConfigMap, `vedavid-dashboards-<directory>`, in the
 `vedavid` namespace. The connector chart mounts any number of them:
