@@ -7,4 +7,4 @@ Needs the metrics rust-k8s-demo's services expose: `http_requests_total`, `http_
 Builds the ConfigMap `vedavid-dashboards-rust-k8s-demo`. Add it to the connector's
 `dashboards.sources` to mount it.
 
-`quotation-service.yaml` looks inside the quotation service: request outcomes, where a request spends its time between Redis and Postgres, cache lookups, and the process's memory, CPU and open files.
+`quotation-service.yaml` looks inside the quotation service, where `service-latency.yaml` stops: the Redis cache, the Postgres connection pool, gRPC outcomes, and the process's memory, CPU and open files.
