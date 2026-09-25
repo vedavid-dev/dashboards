@@ -6,4 +6,5 @@ generatorOptions:
 configMapGenerator:
   - name: vedavid-dashboards-rust-k8s-demo
     files:
+      - quotation-service.yaml
       - service-latency.yaml

@@ -1,0 +1,78 @@
+version: 1
+id: quotation-service
+title: Quotation service
+sections:
+  - title: Overview
+    elements:
+      - type: stat
+        title: Requests per second
+        query: sum(rate(grpc_requests_total{namespace="workload", job="kubernetes-pods"}[5m]))
+        unit: requests_per_sec
+      - type: stat
+        title: Failed requests
+        query: 100 * (sum(rate(grpc_requests_total{namespace="workload", job="kubernetes-pods", code!="Ok"}[5m])) or vector(0)) / sum(rate(grpc_requests_total{namespace="workload", job="kubernetes-pods"}[5m]))
+        unit: percent
+        thresholds:
+          direction: above
+          steps:
+            - { at: 1, level: warning }
+            - { at: 5, level: critical }
+      - type: stat
+        title: p95 latency
+        query: histogram_quantile(0.95, sum by (le) (rate(grpc_request_duration_seconds_bucket{namespace="workload", job="kubernetes-pods"}[5m]))) * 1000
+        unit: milliseconds
+        thresholds:
+          direction: above
+          steps:
+            - { at: 100, level: warning }
+            - { at: 500, level: critical }
+      - type: stat
+        title: Cache hit rate
+        query: 100 * sum(rate(cache_requests_total{namespace="workload", job="kubernetes-pods", result="hit"}[5m])) / sum(rate(cache_requests_total{namespace="workload", job="kubernetes-pods"}[5m]))
+        unit: percent
+        decimals: 0
+  - title: Where the time goes
+    elements:
+      - type: line
+        title: p95 by step
+        description: A request is a Redis lookup, and on a miss a pooled Postgres connection and a query.
+        query: label_replace(histogram_quantile(0.95, sum by (le) (rate(grpc_request_duration_seconds_bucket{namespace="workload", job="kubernetes-pods"}[5m]))) * 1000, "step", "request", "", "") or label_replace(histogram_quantile(0.95, sum by (le) (rate(cache_request_duration_seconds_bucket{namespace="workload", job="kubernetes-pods", op="get"}[5m]))) * 1000, "step", "redis get", "", "") or label_replace(histogram_quantile(0.95, sum by (le) (rate(postgres_checkout_duration_seconds_bucket{namespace="workload", job="kubernetes-pods"}[5m]))) * 1000, "step", "postgres checkout", "", "") or label_replace(histogram_quantile(0.95, sum by (le) (rate(postgres_query_duration_seconds_bucket{namespace="workload", job="kubernetes-pods"}[5m]))) * 1000, "step", "postgres query", "", "")
+        unit: milliseconds
+        series:
+          label: "{{step}}"
+  - title: Traffic
+    elements:
+      - type: line
+        title: Requests by outcome
+        query: sum by (code) (rate(grpc_requests_total{namespace="workload", job="kubernetes-pods"}[5m]))
+        unit: requests_per_sec
+        stack: true
+        series:
+          label: "{{code}}"
+      - type: line
+        title: Cache lookups by result
+        query: sum by (result) (rate(cache_requests_total{namespace="workload", job="kubernetes-pods"}[5m]))
+        unit: ops_per_sec
+        stack: true
+        series:
+          label: "{{result}}"
+  - title: Process
+    elements:
+      - type: line
+        title: Memory by pod
+        query: process_resident_memory_bytes{namespace="workload", job="kubernetes-pods", app="quotationservice"}
+        unit: bytes
+        series:
+          label: "{{pod}}"
+      - type: line
+        title: CPU by pod
+        query: rate(process_cpu_seconds_total{namespace="workload", job="kubernetes-pods", app="quotationservice"}[5m])
+        unit: cores
+        series:
+          label: "{{pod}}"
+      - type: list
+        title: Open file descriptors
+        query: process_open_fds{namespace="workload", job="kubernetes-pods", app="quotationservice"}
+        unit: count
+        label: "{{pod}}"
+        limit: 5
