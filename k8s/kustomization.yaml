@@ -7,3 +7,4 @@ configMapGenerator:
   - name: vedavid-dashboards-k8s
     files:
       - cluster-overview.yaml
+      - prometheus.yaml
