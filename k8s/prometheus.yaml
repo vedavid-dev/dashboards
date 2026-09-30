@@ -1,6 +1,7 @@
 version: 1
 id: prometheus
 title: Prometheus
+tags: [kubernetes, prometheus, monitoring]
 sections:
   - title: Health
     elements:

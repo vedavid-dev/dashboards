@@ -1,6 +1,7 @@
 version: 1
 id: quotation-service
 title: Quotation service internals
+tags: [rust-k8s-demo, redis, postgres]
 sections:
   - title: Cache
     elements:
