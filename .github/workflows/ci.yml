@@ -16,7 +16,8 @@ jobs:
         with:
           path: ~/.cargo/bin/vedavid-dash
           key: vedavid-dash-${{ runner.os }}-${{ hashFiles('.github/workflows/ci.yml') }}
+      # The cache key hashes this file, so moving the rev rebuilds the linter.
       - name: Install the dashboard linter
-        run: command -v vedavid-dash || cargo install --git https://github.com/vedavid-dev/dashboard-dsl vedavid-dash
+        run: command -v vedavid-dash || cargo install --git https://github.com/vedavid-dev/dashboard-dsl --rev dd9ba246e93080d85418758fc0af1d12d5188ad8 vedavid-dash
       - run: find . -path ./.git -prune -o -name '*.yaml' ! -name kustomization.yaml -print0 | xargs -0 vedavid-dash lint
       - run: for d in . */; do kubectl kustomize "$d" > /dev/null; done
