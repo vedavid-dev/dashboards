@@ -1,6 +1,7 @@
 version: 1
 id: postgres
 title: Postgres
+tags: [postgres, database]
 
 sections:
   - title: Health

@@ -1,6 +1,7 @@
 version: 1
 id: cluster-overview
 title: Cluster health
+tags: [kubernetes, compute]
 
 sections:
   - title: Health

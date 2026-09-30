@@ -1,6 +1,7 @@
 version: 1
 id: redis
 title: Redis
+tags: [redis, cache]
 
 sections:
   - title: Health

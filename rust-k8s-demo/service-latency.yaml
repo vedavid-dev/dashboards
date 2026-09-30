@@ -1,6 +1,7 @@
 version: 1
 id: service-latency
 title: Service latency
+tags: [rust-k8s-demo, http, grpc]
 sections:
   - title: Overview
     elements:
